@@ -1,0 +1,1822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>PDF Border — Add borders to PDF pages online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf-lib/1.17.1/pdf-lib.min.js"></script>
+<style>
+/* ============ TOKENS ============ */
+:root{
+  --red-700:#A9182C;
+  --red-600:#D7263D;
+  --red-500:#E24558;
+  --red-50:#FDEEF0;
+  --ink:#1F2328;
+  --ink-soft:#3A3F46;
+  --gray-600:#6B7280;
+  --gray-500:#8A93A1;
+  --gray-400:#AEB6C2;
+  --gray-300:#CBD2DB;
+  --gray-200:#E4E8EE;
+  --gray-100:#F0F2F6;
+  --gray-50:#F8F9FB;
+  --workspace-bg:#EAEEF4;
+  --white:#FFFFFF;
+  --green:#1A9850;
+  --radius-sm:7px;
+  --radius-md:11px;
+  --radius-lg:18px;
+  --radius-xl:22px;
+  --shadow-xs:0 1px 2px rgba(20,24,34,.05);
+  --shadow-sm:0 2px 8px rgba(20,24,34,.07);
+  --shadow-md:0 8px 24px rgba(20,24,34,.10);
+  --shadow-lg:0 18px 48px rgba(20,24,34,.16);
+  --font:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --header-h:60px;
+  --crumb-h:40px;
+}
+*,*::before,*::after{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;
+  font-family:var(--font);
+  color:var(--ink);
+  background:var(--white);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img,svg{display:block;}
+button{font-family:inherit;}
+input,select,button,textarea{font-family:inherit;color:inherit;}
+a{color:inherit;text-decoration:none;}
+h1,h2,h3,h4,p{margin:0;}
+button{cursor:pointer;}
+:focus-visible{outline:2px solid var(--red-600);outline-offset:2px;}
+.visually-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;}
+
+/* ============ HEADER ============ */
+.site-header{
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+  border-bottom:1px solid var(--gray-200);
+  box-shadow:var(--shadow-xs);
+  position:relative;z-index:40;
+  background:var(--white);
+  gap:24px;
+}
+.brand{display:flex;align-items:center;gap:10px;flex:0 0 auto;}
+.brand-mark{width:30px;height:30px;border-radius:9px;background:var(--red-600);position:relative;flex:none;}
+.brand-mark svg{position:absolute;inset:0;margin:auto;}
+.brand-name{font-weight:700;font-size:16.5px;letter-spacing:-.01em;white-space:nowrap;}
+.main-nav{display:flex;align-items:center;gap:4px;overflow-x:auto;scrollbar-width:none;flex:1;}
+.main-nav::-webkit-scrollbar{display:none;}
+.main-nav a{
+  font-size:14px;font-weight:500;color:var(--ink-soft);
+  padding:8px 12px;border-radius:var(--radius-sm);white-space:nowrap;
+  transition:background .15s,color .15s;
+}
+.main-nav a:hover{background:var(--gray-100);color:var(--ink);}
+.main-nav a.disabled{color:var(--gray-400);cursor:default;}
+.main-nav a.disabled:hover{background:none;}
+.header-cta{flex:none;}
+.btn-ghost-header{
+  font-size:13.5px;font-weight:600;padding:8px 14px;border-radius:var(--radius-sm);
+  border:1px solid var(--gray-200);background:var(--white);color:var(--ink);
+  white-space:nowrap;
+}
+.btn-ghost-header:hover{border-color:var(--gray-300);background:var(--gray-50);}
+
+.breadcrumb{
+  height:var(--crumb-h);display:flex;align-items:center;gap:6px;
+  padding:0 24px;font-size:13px;color:var(--gray-500);
+  border-bottom:1px solid var(--gray-100);
+  background:var(--gray-50);
+}
+.breadcrumb .sep{color:var(--gray-400);}
+.breadcrumb .current{color:var(--ink);font-weight:600;}
+.breadcrumb a{color:var(--gray-500);}
+.breadcrumb a:hover{color:var(--red-600);text-decoration:underline;}
+
+/* ============ LEGAL PAGES ============ */
+.legal-page{max-width:720px;margin:0 auto;padding:48px 24px 90px;}
+.legal-back{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;font-weight:600;color:var(--gray-600);margin-bottom:28px;}
+.legal-back:hover{color:var(--red-600);}
+.legal-page h1{font-size:30px;font-weight:800;letter-spacing:-.01em;margin-bottom:6px;}
+.legal-updated{font-size:13px;color:var(--gray-500);margin-bottom:36px;}
+.legal-page h2{font-size:18px;font-weight:700;margin:32px 0 10px;}
+.legal-page p{font-size:14.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:14px;}
+.legal-page ul{margin:0 0 14px;padding-left:20px;}
+.legal-page li{font-size:14.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:6px;}
+.legal-note{margin-top:40px;padding:16px 18px;background:var(--gray-50);border:1px solid var(--gray-200);border-radius:var(--radius-md);font-size:13px;color:var(--gray-600);line-height:1.6;}
+.legal-page a.inline-link{color:var(--red-600);font-weight:600;}
+
+/* ============ LANDING ============ */
+#view-landing{max-width:1180px;margin:0 auto;padding:0 24px;}
+.hero{padding:56px 0 8px;text-align:center;}
+.hero h1{
+  font-size:clamp(28px,4vw,40px);font-weight:800;letter-spacing:-.02em;
+  line-height:1.15;max-width:680px;margin:0 auto;
+}
+.hero p.sub{
+  margin:16px auto 0;max-width:640px;color:var(--gray-600);
+  font-size:16px;line-height:1.6;
+}
+
+.upload-card{
+  margin:36px auto 0;max-width:660px;
+  border:2px dashed var(--gray-300);border-radius:var(--radius-xl);
+  background:var(--gray-50);
+  padding:44px 32px;text-align:center;
+  transition:border-color .15s,background .15s;
+  position:relative;
+}
+.upload-card.dragover{border-color:var(--red-600);background:var(--red-50);}
+.upload-icon{width:56px;height:56px;margin:0 auto 18px;color:var(--red-600);}
+.upload-card h2{font-size:19px;font-weight:700;margin-bottom:18px;}
+.cloud-row{display:flex;gap:10px;justify-content:center;margin-bottom:16px;flex-wrap:wrap;}
+.btn-cloud{
+  display:flex;align-items:center;gap:8px;padding:9px 16px;
+  border:1px solid var(--gray-300);border-radius:var(--radius-md);
+  background:var(--white);font-size:13.5px;font-weight:600;color:var(--ink-soft);
+  position:relative;
+}
+.btn-cloud:hover{background:var(--gray-100);}
+.btn-cloud .soon{
+  font-size:10px;font-weight:700;color:var(--gray-500);background:var(--gray-100);
+  border-radius:20px;padding:2px 7px;margin-left:2px;
+}
+.upload-or{font-size:13px;color:var(--gray-500);margin-bottom:20px;}
+.btn-select-files{
+  display:inline-flex;align-items:center;gap:8px;
+  background:var(--red-600);color:var(--white);border:none;
+  padding:13px 26px;border-radius:var(--radius-md);font-size:15px;font-weight:700;
+  box-shadow:var(--shadow-sm);transition:background .15s,transform .1s;
+}
+.btn-select-files:hover{background:var(--red-700);}
+.btn-select-files:active{transform:scale(.98);}
+.upload-meta{margin-top:18px;font-size:12.5px;color:var(--gray-500);}
+.upload-meta .dot{margin:0 8px;color:var(--gray-300);}
+
+#upload-state-loading,#upload-state-error{display:none;}
+.progress-track{
+  width:100%;max-width:360px;margin:8px auto 0;height:8px;background:var(--gray-200);
+  border-radius:99px;overflow:hidden;
+}
+.progress-fill{height:100%;width:0%;background:var(--red-600);border-radius:99px;transition:width .15s;}
+.progress-label{margin-top:10px;font-size:13px;color:var(--gray-600);font-weight:500;}
+.error-box{color:var(--red-700);}
+.error-box svg{width:40px;height:40px;margin:0 auto 12px;}
+.error-box p{font-size:14px;margin-bottom:16px;color:var(--ink-soft);}
+.btn-retry{
+  border:1px solid var(--gray-300);background:var(--white);padding:8px 18px;
+  border-radius:var(--radius-sm);font-weight:600;font-size:13.5px;
+}
+.btn-retry:hover{background:var(--gray-100);}
+
+/* info sections */
+.section-heading{font-size:24px;font-weight:800;letter-spacing:-.01em;text-align:center;margin-bottom:6px;}
+.section-sub{text-align:center;color:var(--gray-600);font-size:14.5px;margin-bottom:34px;}
+.how-it-works{padding:76px 0 8px;}
+.steps-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}
+.step-card{padding:22px 18px;border:1px solid var(--gray-200);border-radius:var(--radius-lg);background:var(--white);}
+.step-num{
+  width:30px;height:30px;border-radius:8px;background:var(--red-50);color:var(--red-600);
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;margin-bottom:14px;
+}
+.step-card h3{font-size:15px;font-weight:700;margin-bottom:6px;}
+.step-card p{font-size:13.5px;color:var(--gray-600);line-height:1.55;}
+
+.perfect-for{padding:70px 0 8px;}
+.chip-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
+.chip-card{
+  border:1px solid var(--gray-200);border-radius:var(--radius-md);
+  padding:16px 14px;font-size:13.5px;font-weight:600;color:var(--ink-soft);
+  display:flex;align-items:center;gap:10px;background:var(--gray-50);
+}
+.chip-card svg{width:18px;height:18px;color:var(--red-600);flex:none;}
+
+.privacy-section{padding:70px 0 8px;}
+.privacy-box{
+  max-width:760px;margin:0 auto;text-align:center;border:1px solid var(--gray-200);
+  border-radius:var(--radius-xl);padding:36px 30px;background:var(--gray-50);
+}
+.privacy-box svg{width:34px;height:34px;color:var(--red-600);margin:0 auto 14px;}
+.privacy-box h3{font-size:18px;font-weight:800;margin-bottom:10px;}
+.privacy-box p{font-size:14px;color:var(--gray-600);line-height:1.6;max-width:520px;margin:0 auto;}
+.privacy-tags{margin-top:18px;font-size:12.5px;color:var(--gray-500);font-weight:600;}
+.privacy-tags .dot{margin:0 8px;color:var(--gray-300);}
+
+.site-footer{margin-top:84px;border-top:1px solid var(--gray-200);padding:38px 24px 42px;}
+.footer-inner{max-width:1180px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:24px;}
+.footer-brand p{font-size:13px;color:var(--gray-500);margin-top:6px;max-width:260px;line-height:1.5;}
+.footer-nav{display:flex;gap:22px;flex-wrap:wrap;}
+.footer-nav a{font-size:13.5px;color:var(--ink-soft);font-weight:500;}
+.footer-nav a:hover{color:var(--red-600);}
+.footer-meta{font-size:12.5px;color:var(--gray-500);margin-top:16px;}
+.footer-meta a{color:var(--red-600);font-weight:600;}
+.footer-meta a:hover{text-decoration:underline;}
+
+/* ============ EDITOR VIEW ============ */
+#view-editor{display:none;height:calc(100vh - var(--header-h) - var(--crumb-h));overflow:hidden;}
+.editor-shell{display:flex;height:100%;}
+.workspace-col{flex:1;position:relative;background:var(--workspace-bg);overflow-y:auto;min-width:0;}
+.workspace-inner{padding:40px 40px 120px;display:flex;flex-direction:column;align-items:center;gap:28px;min-height:100%;}
+.pdf-page{
+  position:relative;background:var(--white);box-shadow:0 1px 3px rgba(20,24,34,.12),0 1px 1px rgba(20,24,34,.06);
+  border:1px solid rgba(20,24,34,.06);line-height:0;flex:none;
+}
+.pdf-page canvas{display:block;}
+.pdf-page .page-loading{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:var(--white);
+}
+.page-label{
+  position:absolute;top:-26px;left:0;font-size:11.5px;font-weight:600;color:var(--gray-500);
+}
+.page-excluded-tag{
+  position:absolute;top:8px;left:8px;background:rgba(31,35,40,.72);color:#fff;font-size:10.5px;
+  font-weight:600;padding:3px 8px;border-radius:99px;letter-spacing:.02em;
+}
+
+.border-frame{position:absolute;pointer-events:none;box-sizing:border-box;}
+.border-frame.style-solid{border-style:solid;}
+.border-frame.style-dashed{border-style:dashed;}
+.border-frame.style-dotted{border-style:dotted;}
+.border-frame.style-double{border-style:double;}
+.border-frame.style-svg{border:none;}
+.svg-corner{position:absolute;width:64px;height:64px;overflow:visible;pointer-events:none;}
+.svg-frame-line{position:absolute;pointer-events:none;box-sizing:border-box;border-style:solid;opacity:.55;}
+
+.pdf-page.is-active .border-frame{pointer-events:auto;cursor:move;}
+.pdf-page.is-active .border-frame::after{
+  content:'';position:absolute;inset:-1px;border:1px solid var(--red-600);opacity:0;
+}
+.handle{
+  position:absolute;width:14px;height:14px;background:var(--white);border:2px solid var(--red-600);
+  border-radius:4px;box-shadow:var(--shadow-xs);pointer-events:auto;z-index:5;touch-action:none;
+}
+.handle.h-top{top:-8px;left:50%;margin-left:-7px;cursor:ns-resize;}
+.handle.h-bottom{bottom:-8px;left:50%;margin-left:-7px;cursor:ns-resize;}
+.handle.h-left{left:-8px;top:50%;margin-top:-7px;cursor:ew-resize;}
+.handle.h-right{right:-8px;top:50%;margin-top:-7px;cursor:ew-resize;}
+
+.delete-pdf-btn{
+  position:absolute;top:20px;right:20px;z-index:20;
+  width:40px;height:40px;border-radius:50%;background:var(--white);border:1px solid var(--gray-200);
+  display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow-sm);color:var(--red-600);
+}
+.delete-pdf-btn:hover{background:var(--red-600);color:var(--white);border-color:var(--red-600);}
+
+.viewer-toolbar{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);z-index:20;
+  background:rgba(31,35,40,.92);backdrop-filter:blur(6px);color:#fff;
+  border-radius:99px;padding:6px 8px;display:flex;align-items:center;gap:2px;
+  box-shadow:var(--shadow-lg);
+}
+.tb-btn{
+  width:32px;height:32px;border:none;background:transparent;color:#fff;border-radius:99px;
+  display:flex;align-items:center;justify-content:center;
+}
+.tb-btn:hover{background:rgba(255,255,255,.14);}
+.tb-btn:disabled{opacity:.35;}
+.tb-btn svg{width:16px;height:16px;}
+.tb-text{font-size:12.5px;font-weight:600;padding:0 4px;min-width:52px;text-align:center;white-space:nowrap;}
+.tb-page-input{
+  width:28px;background:transparent;border:none;color:#fff;font-size:12.5px;font-weight:600;
+  text-align:right;padding:0;
+}
+.tb-div{width:1px;height:18px;background:rgba(255,255,255,.2);margin:0 4px;}
+
+/* ============ SETTINGS PANEL ============ */
+.settings-col{
+  width:400px;flex:none;background:var(--white);border-left:1px solid var(--gray-200);
+  overflow-y:auto;
+}
+.settings-inner{padding:26px 26px 100px;}
+.settings-title{font-size:21px;font-weight:800;letter-spacing:-.01em;}
+.settings-divider{height:1px;background:var(--gray-200);margin:16px 0 22px;}
+.field-group{margin-bottom:22px;}
+.field-label-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.field-label{font-size:13px;font-weight:700;color:var(--ink);}
+.btn-recommended{
+  font-size:11.5px;font-weight:700;color:var(--red-600);background:var(--red-50);
+  border:none;padding:4px 10px;border-radius:99px;
+}
+.btn-recommended:hover{background:#FBDCE0;}
+.input-text,.input-number,.select-style{
+  width:100%;border:1px solid var(--gray-300);border-radius:var(--radius-sm);
+  padding:10px 12px;font-size:14px;background:var(--white);color:var(--ink);
+}
+.input-text:focus,.input-number:focus,.select-style:focus{border-color:var(--red-600);}
+.input-hint{font-size:11.5px;color:var(--gray-500);margin-top:6px;}
+.field-error{font-size:11.5px;color:var(--red-600);margin-top:6px;display:none;font-weight:600;}
+
+.select-wrap{position:relative;}
+.select-style{appearance:none;-webkit-appearance:none;padding-right:34px;cursor:pointer;}
+.select-wrap svg{position:absolute;right:11px;top:50%;transform:translateY(-50%);width:14px;height:14px;pointer-events:none;color:var(--gray-500);}
+
+.color-row{display:flex;align-items:center;gap:10px;}
+.color-swatch-btn{
+  width:42px;height:42px;border-radius:var(--radius-sm);border:1px solid var(--gray-300);
+  padding:0;overflow:hidden;flex:none;position:relative;background:#000;
+}
+.color-swatch-btn input[type=color]{
+  position:absolute;inset:-4px;width:calc(100% + 8px);height:calc(100% + 8px);border:none;padding:0;cursor:pointer;
+}
+.preset-colors{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.preset-color{width:24px;height:24px;border-radius:50%;border:2px solid var(--white);box-shadow:0 0 0 1px var(--gray-200);flex:none;}
+.preset-color.active{box-shadow:0 0 0 2px var(--ink);}
+
+.pill-row{display:flex;flex-wrap:wrap;gap:8px;}
+.preset-pill{
+  padding:8px 15px;border-radius:99px;border:1px solid var(--gray-300);background:var(--white);
+  font-size:13px;font-weight:600;color:var(--ink-soft);
+}
+.preset-pill:hover{background:var(--gray-100);}
+.preset-pill.active{background:var(--red-600);border-color:var(--red-600);color:var(--white);}
+
+.margins-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 14px;}
+.margin-field label{display:block;font-size:11.5px;color:var(--gray-500);font-weight:600;margin-bottom:5px;}
+
+.svg-panel{border-top:1px dashed var(--gray-300);padding-top:20px;margin-top:2px;}
+.svg-upload-row{display:flex;gap:8px;margin-bottom:14px;}
+.btn-svg-action{
+  flex:1;border:1px solid var(--gray-300);background:var(--white);border-radius:var(--radius-sm);
+  padding:10px;font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-svg-action:hover{background:var(--gray-100);}
+.btn-svg-action.active{border-color:var(--red-600);color:var(--red-600);background:var(--red-50);}
+.template-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+.template-tile{
+  border:1.5px solid var(--gray-200);border-radius:var(--radius-md);padding:10px 6px 8px;
+  display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--gray-50);
+}
+.template-tile svg{width:34px;height:34px;color:var(--ink-soft);}
+.template-tile span{font-size:10.5px;font-weight:600;color:var(--gray-600);}
+.template-tile.active{border-color:var(--red-600);background:var(--red-50);}
+.template-tile.active svg{color:var(--red-600);}
+.slider-row{margin-bottom:16px;}
+.slider-row .field-label-row{margin-bottom:4px;}
+.slider-val{font-size:12px;color:var(--gray-500);font-weight:600;}
+input[type=range]{width:100%;accent-color:var(--red-600);}
+
+.btn-download{
+  width:100%;background:var(--red-600);color:var(--white);border:none;border-radius:var(--radius-md);
+  padding:16px;font-size:15.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px;
+  box-shadow:var(--shadow-sm);margin-top:6px;transition:background .15s;
+}
+.btn-download:hover{background:var(--red-700);}
+.btn-download:disabled{background:var(--gray-300);cursor:default;}
+.spinner{
+  width:16px;height:16px;border-radius:50%;border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+  animation:spin .7s linear infinite;display:none;
+}
+.btn-download.is-loading .spinner{display:inline-block;}
+.btn-download.is-loading .dl-arrow{display:none;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* mobile drawer handle (hidden on desktop) */
+.drawer-handle{display:none;}
+
+/* ============ MODALS ============ */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(20,24,34,.5);display:none;align-items:center;justify-content:center;
+  z-index:100;padding:20px;
+}
+.modal-backdrop.open{display:flex;}
+.modal-card{
+  background:var(--white);border-radius:var(--radius-lg);padding:28px;max-width:380px;width:100%;
+  box-shadow:var(--shadow-lg);text-align:center;
+}
+.modal-card h3{font-size:18px;font-weight:800;margin-bottom:10px;}
+.modal-card p{font-size:14px;color:var(--gray-600);line-height:1.5;margin-bottom:22px;}
+.modal-actions{display:flex;gap:10px;}
+.btn-modal-cancel{
+  flex:1;padding:11px;border-radius:var(--radius-sm);border:1px solid var(--gray-300);background:var(--white);
+  font-weight:700;font-size:14px;
+}
+.btn-modal-cancel:hover{background:var(--gray-100);}
+.btn-modal-danger{
+  flex:1;padding:11px;border-radius:var(--radius-sm);border:none;background:var(--red-600);color:#fff;
+  font-weight:700;font-size:14px;
+}
+.btn-modal-danger:hover{background:var(--red-700);}
+
+.success-check{
+  width:64px;height:64px;border-radius:50%;background:#E8F6EC;color:var(--green);
+  display:flex;align-items:center;justify-content:center;margin:0 auto 18px;
+}
+.success-check svg{width:32px;height:32px;}
+.btn-modal-primary{
+  width:100%;padding:14px;border-radius:var(--radius-md);border:none;background:var(--red-600);color:#fff;
+  font-weight:700;font-size:14.5px;margin-bottom:10px;
+}
+.btn-modal-primary:hover{background:var(--red-700);}
+.modal-secondary-row{display:flex;gap:8px;margin-bottom:18px;}
+.btn-modal-secondary{
+  flex:1;padding:10px;border-radius:var(--radius-sm);border:1px solid var(--gray-300);background:var(--white);
+  font-weight:600;font-size:13px;
+}
+.btn-modal-secondary:hover{background:var(--gray-100);}
+.modal-cloud-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.btn-cloud-small{
+  font-size:11.5px;font-weight:600;color:var(--gray-400);border:1px solid var(--gray-200);
+  padding:6px 12px;border-radius:99px;background:var(--gray-50);cursor:default;
+}
+
+.toast-container{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{
+  background:var(--ink);color:#fff;padding:11px 18px;border-radius:99px;font-size:13px;font-weight:600;
+  box-shadow:var(--shadow-md);opacity:0;transform:translateY(8px);transition:opacity .2s,transform .2s;
+}
+.toast.show{opacity:1;transform:translateY(0);}
+
+/* ============ RESPONSIVE ============ */
+@media (max-width:980px){
+  .steps-grid{grid-template-columns:1fr 1fr;}
+  .chip-grid{grid-template-columns:1fr 1fr;}
+}
+@media (max-width:900px){
+  .editor-shell{flex-direction:column;}
+  .workspace-col{flex:1;order:1;}
+  .workspace-inner{padding:24px 16px 140px;}
+  .settings-col{
+    width:100%;border-left:none;border-top:1px solid var(--gray-200);
+    position:fixed;left:0;right:0;bottom:0;max-height:46vh;order:2;
+    border-radius:18px 18px 0 0;box-shadow:0 -8px 24px rgba(20,24,34,.14);z-index:30;
+    transform:translateY(calc(100% - 54px));transition:transform .25s ease;
+  }
+  .settings-col.drawer-open{transform:translateY(0);max-height:78vh;}
+  .drawer-handle{
+    display:flex;align-items:center;justify-content:space-between;padding:14px 20px;
+    border-bottom:1px solid var(--gray-100);
+  }
+  .drawer-handle .bar{width:36px;height:4px;background:var(--gray-300);border-radius:99px;position:absolute;left:50%;top:8px;transform:translateX(-50%);}
+  .drawer-handle-label{font-size:14px;font-weight:700;}
+  .drawer-handle svg{width:16px;height:16px;transition:transform .2s;}
+  .settings-col.drawer-open .drawer-handle svg{transform:rotate(180deg);}
+  #view-editor{height:calc(100vh - var(--header-h) - var(--crumb-h));}
+}
+@media (max-width:640px){
+  .steps-grid{grid-template-columns:1fr;}
+  .chip-grid{grid-template-columns:1fr;}
+  .footer-inner{flex-direction:column;}
+  .upload-card{padding:32px 18px;}
+  .site-header{padding:0 14px;gap:12px;}
+  .breadcrumb{padding:0 14px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ HEADER ============ -->
+<header class="site-header">
+  <div class="brand">
+    <span class="brand-mark">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M1 5V1.8C1 1.36 1.36 1 1.8 1H5" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="M15 5V1.8C15 1.36 14.64 1 14.2 1H11" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="M1 11V14.2C1 14.64 1.36 15 1.8 15H5" stroke="white" stroke-width="1.6" stroke-linecap="round"/><path d="M15 11V14.2C15 14.64 14.64 15 14.2 15H11" stroke="white" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </span>
+    <span class="brand-name">PDF Border</span>
+  </div>
+
+</header>
+<div class="breadcrumb">
+  <a href="#" id="crumb-home">Home</a><span class="sep">→</span><span>PDF Tools</span><span class="sep">→</span><span class="current" id="crumb-current">Add PDF Border</span>
+</div>
+
+<!-- ============ LANDING VIEW ============ -->
+<main id="view-landing">
+  <section class="hero">
+    <h1>Add PDF Border Online</h1>
+    <p class="sub">Add custom borders to PDF pages online for free. Create professional-looking documents by adding stylish borders, adjusting colors, border thickness, margins, and page-specific layouts, all without installing software.</p>
+
+    <div class="upload-card" id="dropzone">
+      <input type="file" id="file-input" accept="application/pdf,.pdf" class="visually-hidden">
+      <input type="file" id="svg-file-input" accept="image/svg+xml,.svg" class="visually-hidden">
+
+      <div id="upload-state-idle">
+        <svg class="upload-icon" viewBox="0 0 56 56" fill="none"><rect x="10" y="4" width="36" height="48" rx="4" stroke="currentColor" stroke-width="2.2"/><path d="M10 14H46" stroke="currentColor" stroke-width="2.2"/><rect x="16" y="22" width="24" height="18" rx="2" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>
+        <h2>Select PDF Files</h2>
+        <div class="cloud-row">
+          <button type="button" class="btn-cloud" data-cloud="Google Drive">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M5.6 2 1 10l2.2 3.8h4.5l4.5-7.9z" fill="#8A93A1"/><path d="M10.2 5.9 5.7 2h4.6L15 10l-2.2 3.8z" fill="#AEB6C2"/></svg>
+            Google Drive <span class="soon">Soon</span>
+          </button>
+          <button type="button" class="btn-cloud" data-cloud="Dropbox">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4 2 8 5 4 8 0 5z" fill="#8A93A1"/><path d="M12 2 16 5 12 8 8 5z" fill="#8A93A1"/><path d="M4 9 8 12 4 15 0 12z" fill="#AEB6C2"/><path d="M12 9 16 12 12 15 8 12z" fill="#AEB6C2"/></svg>
+            Dropbox <span class="soon">Soon</span>
+          </button>
+        </div>
+        <button type="button" class="btn-select-files" id="btn-select-files">
+          <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M8.5 2v9M4.5 7l4-5 4 5" stroke="white" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 12.5v1.3c0 .77.63 1.4 1.4 1.4h9.2c.77 0 1.4-.63 1.4-1.4v-1.3" stroke="white" stroke-width="1.7" stroke-linecap="round"/></svg>
+          Select PDF Files
+        </button>
+        <p class="upload-or">or drop PDFs here</p>
+      </div>
+
+      <div id="upload-state-loading">
+        <svg class="upload-icon" viewBox="0 0 56 56" fill="none"><rect x="10" y="4" width="36" height="48" rx="4" stroke="currentColor" stroke-width="2.2"/></svg>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+        <p class="progress-label" id="progress-label">Reading file…</p>
+      </div>
+
+      <div id="upload-state-error">
+        <div class="error-box">
+          <svg viewBox="0 0 40 40" fill="none"><circle cx="20" cy="20" r="18" stroke="currentColor" stroke-width="2"/><path d="M20 12v10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="20" cy="27" r="1.6" fill="currentColor"/></svg>
+          <p id="error-message">This doesn't look like a valid PDF. Please try another file.</p>
+          <button type="button" class="btn-retry" id="btn-retry">Try again</button>
+        </div>
+      </div>
+    </div>
+    <p class="upload-meta">Free<span class="dot">•</span>No registration required<span class="dot">•</span>Processed entirely in your browser</p>
+  </section>
+
+  <section class="how-it-works">
+    <h2 class="section-heading">How to Add Borders to PDF Pages Online</h2>
+    <p class="section-sub">Four steps, no software, no waiting.</p>
+    <div class="steps-grid">
+      <div class="step-card"><div class="step-num">1</div><h3>Upload Your PDF</h3><p>Select a PDF from your device or drag and drop it into the upload area.</p></div>
+      <div class="step-card"><div class="step-num">2</div><h3>Choose Pages</h3><p>Choose all pages or specify a custom page range.</p></div>
+      <div class="step-card"><div class="step-num">3</div><h3>Customize Your Border</h3><p>Choose a preset or customize style, color, width, margins, and position.</p></div>
+      <div class="step-card"><div class="step-num">4</div><h3>Preview and Download</h3><p>Review your changes and download the finished PDF.</p></div>
+    </div>
+  </section>
+
+  <section class="perfect-for">
+    <h2 class="section-heading">Perfect For</h2>
+    <p class="section-sub">Wherever a document needs to look a little more finished.</p>
+    <div class="chip-grid" id="chip-grid"></div>
+  </section>
+
+  <section class="privacy-section">
+    <div class="privacy-box">
+      <svg viewBox="0 0 34 34" fill="none"><path d="M17 3 5 8v8c0 8 5 12.5 12 15 7-2.5 12-7 12-15V8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 17l3.5 3.5L22 13" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3>Your Files Stay Private</h3>
+      <p>PDF Border runs the entire process — rendering, editing, and generating your file — inside your own browser. Your document is never uploaded to a server, so it never has to leave your device.</p>
+      <p class="privacy-tags">No registration required<span class="dot">•</span>Secure local processing<span class="dot">•</span>Nothing ever uploaded</p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="brand-name">PDF Border</span>
+      <p>Simple tools for better-looking PDF documents.</p>
+      <p class="footer-meta">Built by Arti Verma · <a href="https://www.x.com/0x4rt1?utm_source=chatgpt.com" target="_blank" rel="noopener">X: @0x4rt1</a></p>
+    </div>
+    <nav class="footer-nav">
+      <a href="#">PDF Tools</a>
+      <a href="#privacy" id="footer-link-privacy">Privacy</a>
+      <a href="#terms" id="footer-link-terms">Terms</a>
+      <a href="https://www.x.com/0x4rt1" target="_blank" rel="noopener">Contact</a>
+    </nav>
+  </div>
+</footer>
+
+<!-- ============ EDITOR VIEW ============ -->
+<section id="view-editor">
+  <div class="editor-shell">
+    <div class="workspace-col" id="workspace-col">
+      <button type="button" class="delete-pdf-btn" id="btn-delete-pdf" title="Remove this PDF" aria-label="Remove this PDF">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M3 5h11M6.5 5V3.5a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1V5M7 8v5M10 8v5M4.5 5 5 14.5a1 1 0 0 0 1 .9h5a1 1 0 0 0 1-.9L12.5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+
+      <div class="workspace-inner" id="workspace-inner">
+        <div id="pages-container"></div>
+      </div>
+
+      <div class="viewer-toolbar" id="viewer-toolbar">
+        <button type="button" class="tb-btn" id="btn-prev-page" title="Previous page"><svg viewBox="0 0 16 16" fill="none"><path d="M10 3 5 8l5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <span class="tb-text"><input type="number" class="tb-page-input" id="tb-page-input" value="1" min="1">&nbsp;/&nbsp;<span id="tb-page-count">1</span></span>
+        <button type="button" class="tb-btn" id="btn-next-page" title="Next page"><svg viewBox="0 0 16 16" fill="none"><path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="tb-div"></div>
+        <button type="button" class="tb-btn" id="btn-zoom-out" title="Zoom out"><svg viewBox="0 0 16 16" fill="none"><path d="M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <span class="tb-text" id="tb-zoom-display">100%</span>
+        <button type="button" class="tb-btn" id="btn-zoom-in" title="Zoom in"><svg viewBox="0 0 16 16" fill="none"><path d="M8 4v8M4 8h8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+        <div class="tb-div"></div>
+        <button type="button" class="tb-btn" id="btn-fit-screen" title="Fit to screen"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6V3a1 1 0 0 1 1-1h3M14 6V3a1 1 0 0 0-1-1h-3M2 10v3a1 1 0 0 0 1 1h3M14 10v3a1 1 0 0 1-1 1h-3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" class="tb-btn" id="btn-layout-toggle" title="Toggle single-page view"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/><rect x="9" y="2" width="5" height="12" rx="1" stroke="currentColor" stroke-width="1.5"/></svg></button>
+        <button type="button" class="tb-btn" id="btn-fullscreen" title="Fullscreen"><svg viewBox="0 0 16 16" fill="none"><path d="M2 6V3.6C2 2.7 2.7 2 3.6 2H6M14 6V3.6c0-.9-.7-1.6-1.6-1.6H10M2 10v2.4C2 13.3 2.7 14 3.6 14H6M14 10v2.4c0 .9-.7 1.6-1.6 1.6H10" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
+    </div>
+
+    <aside class="settings-col" id="settings-col">
+      <div class="drawer-handle" id="drawer-handle">
+        <span class="bar"></span>
+        <span class="drawer-handle-label">Borders and Shading</span>
+        <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="settings-inner">
+        <h2 class="settings-title">Borders and Shading</h2>
+        <div class="settings-divider"></div>
+
+        <div class="field-group">
+          <div class="field-label-row"><span class="field-label">Page Range</span></div>
+          <input type="text" class="input-text" id="input-page-range" placeholder="e.g. 1-3, 5 (leave empty for all)">
+          <p class="field-error" id="page-range-error">Check the page range — some values are out of bounds.</p>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row"><span class="field-label">Style</span></div>
+          <div class="select-wrap">
+            <select class="select-style" id="select-style">
+              <option value="solid">Solid</option>
+              <option value="dashed">Dashed</option>
+              <option value="dotted">Dotted</option>
+              <option value="double">Double</option>
+              <option value="svg">SVG</option>
+            </select>
+            <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row"><span class="field-label">Color</span></div>
+          <div class="color-row">
+            <span class="color-swatch-btn" id="color-swatch-btn" style="background:#000000;">
+              <input type="color" id="input-color" value="#000000">
+            </span>
+            <input type="text" class="input-text" id="input-hex" value="#000000" maxlength="7">
+          </div>
+          <div class="preset-colors" id="preset-colors"></div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row"><span class="field-label">Presets</span></div>
+          <div class="pill-row" id="preset-pills">
+            <button type="button" class="preset-pill" data-preset="assignment">Assignment</button>
+            <button type="button" class="preset-pill" data-preset="professional">Professional</button>
+            <button type="button" class="preset-pill" data-preset="certificate">Certificate</button>
+            <button type="button" class="preset-pill" data-preset="modern">Modern</button>
+            <button type="button" class="preset-pill" data-preset="elegant">Elegant</button>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row"><span class="field-label">Width (pt)</span></div>
+          <input type="number" class="input-number" id="input-width" value="2" min="0.5" max="20" step="0.5">
+        </div>
+
+        <div class="field-group">
+          <div class="field-label-row">
+            <span class="field-label">Margins (pt)</span>
+            <button type="button" class="btn-recommended" id="btn-recommended-margins">Recommended</button>
+          </div>
+          <div class="margins-grid">
+            <div class="margin-field"><label for="margin-top">Top</label><input type="number" class="input-number" id="margin-top" value="20" min="0"></div>
+            <div class="margin-field"><label for="margin-right">Right</label><input type="number" class="input-number" id="margin-right" value="20" min="0"></div>
+            <div class="margin-field"><label for="margin-bottom">Bottom</label><input type="number" class="input-number" id="margin-bottom" value="20" min="0"></div>
+            <div class="margin-field"><label for="margin-left">Left</label><input type="number" class="input-number" id="margin-left" value="20" min="0"></div>
+          </div>
+        </div>
+
+        <div class="svg-panel" id="svg-panel" style="display:none;">
+          <div class="field-label-row"><span class="field-label">SVG Border</span></div>
+          <div class="svg-upload-row">
+            <button type="button" class="btn-svg-action" id="btn-upload-svg">Upload SVG</button>
+            <button type="button" class="btn-svg-action active" id="btn-choose-template">Choose Template</button>
+          </div>
+          <div class="template-grid" id="template-grid"></div>
+
+          <div class="slider-row">
+            <div class="field-label-row"><span class="field-label">Scale</span><span class="slider-val" id="svg-scale-val">100%</span></div>
+            <input type="range" id="svg-scale" min="40" max="220" value="100">
+          </div>
+          <div class="field-group">
+            <div class="field-label-row"><span class="field-label">Position</span></div>
+            <div class="select-wrap">
+              <select class="select-style" id="svg-position">
+                <option value="corners">Corners only</option>
+                <option value="frame">Full frame</option>
+              </select>
+              <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+          </div>
+          <div class="slider-row">
+            <div class="field-label-row"><span class="field-label">Rotation</span><span class="slider-val" id="svg-rotation-val">0°</span></div>
+            <input type="range" id="svg-rotation" min="0" max="359" value="0">
+          </div>
+          <div class="slider-row">
+            <div class="field-label-row"><span class="field-label">Opacity</span><span class="slider-val" id="svg-opacity-val">100%</span></div>
+            <input type="range" id="svg-opacity" min="10" max="100" value="100">
+          </div>
+        </div>
+
+        <button type="button" class="btn-download" id="btn-download">
+          <span class="spinner"></span>
+          <span class="dl-label">Download PDF</span>
+          <svg class="dl-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<!-- ============ PRIVACY POLICY ============ -->
+<section id="view-privacy" style="display:none;">
+  <div class="legal-page">
+    <a href="#" class="legal-back" id="privacy-back"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2 3 7l6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back to PDF Border</a>
+    <h1>Privacy Policy</h1>
+    <p class="legal-updated">Last updated: September 12, 2026</p>
+
+    <p>PDF Border is a free tool for adding borders to PDF documents. This policy explains what happens to your data when you use it — and the short version is: almost nothing happens to it, because it never leaves your device.</p>
+
+    <h2>How your files are handled</h2>
+    <p>Every part of this tool — reading your PDF, rendering the preview, drawing the border, and generating the final file — runs locally in your browser. Your PDF is never uploaded to a server, stored, or transmitted anywhere. When you close this tab, nothing about your file remains.</p>
+
+    <h2>Information we collect</h2>
+    <p>We don't operate a backend server for this tool, so we don't collect, store, or have access to your documents, your name, your email address, or any account information. There is no sign-up and no account.</p>
+
+    <h2>Cookies and local storage</h2>
+    <p>PDF Border doesn't set cookies and doesn't use browser storage to track you or save data between visits.</p>
+
+    <h2>Third-party resources</h2>
+    <p>To run, this page loads a small number of resources from third-party content delivery networks:</p>
+    <ul>
+      <li><strong>cdnjs (Cloudflare)</strong> — delivers the PDF.js and pdf-lib libraries used to read and generate PDFs.</li>
+      <li><strong>Google Fonts</strong> — delivers the Inter typeface used for the interface.</li>
+    </ul>
+    <p>Loading these resources may expose your IP address and basic browser information to Cloudflare and Google, the same way it would for any website that loads a font or script from a public CDN. We don't control what those providers log; you can review <a class="inline-link" href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's privacy policy</a> for details on font requests.</p>
+
+    <h2>Children's privacy</h2>
+    <p>This tool isn't directed at children and isn't designed to collect information from anyone.</p>
+
+    <h2>Changes to this policy</h2>
+    <p>If this policy changes, the update will be posted on this page with a new "last updated" date.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy can be sent via <a class="inline-link" href="https://www.x.com/0x4rt1" target="_blank" rel="noopener">X (@0x4rt1)</a>.</p>
+
+    <div class="legal-note">This page is a general privacy notice, not legal advice. If you plan to operate this tool for a wider audience, have it reviewed by a lawyer familiar with your jurisdiction's requirements (e.g. GDPR, CCPA).</div>
+  </div>
+</section>
+
+<!-- ============ TERMS OF SERVICE ============ -->
+<section id="view-terms" style="display:none;">
+  <div class="legal-page">
+    <a href="#" class="legal-back" id="terms-back"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M9 2 3 7l6 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> Back to PDF Border</a>
+    <h1>Terms of Service</h1>
+    <p class="legal-updated">Last updated: September 12, 2026</p>
+
+    <p>These terms govern your use of PDF Border. By using this tool, you agree to them.</p>
+
+    <h2>The service</h2>
+    <p>PDF Border is a free, browser-based tool that adds borders to PDF documents. It runs entirely in your browser — there's no account, no subscription, and no server that stores your files.</p>
+
+    <h2>Acceptable use</h2>
+    <p>You agree to use PDF Border only for lawful purposes. You're responsible for the content of any PDF you process with this tool, and for making sure you have the right to modify it.</p>
+
+    <h2>Your files, your ownership</h2>
+    <p>We never receive, store, or have access to the documents you process, so we make no claim of any kind to their content. Anything you create with this tool is entirely yours.</p>
+
+    <h2>No warranty</h2>
+    <p>PDF Border is provided "as is," without warranties of any kind, express or implied. We don't guarantee it will be error-free, available at all times, or fit for any particular purpose. Always keep a backup of your original file before processing it.</p>
+
+    <h2>Limitation of liability</h2>
+    <p>To the fullest extent permitted by law, PDF Border and its creator are not liable for any damages or losses arising from your use of this tool, including data loss or issues with an output file.</p>
+
+    <h2>Third-party software</h2>
+    <p>This tool uses the open-source libraries PDF.js and pdf-lib to read and generate PDF files, each under their own respective open-source licenses.</p>
+
+    <h2>Changes</h2>
+    <p>These terms, and the tool itself, may change over time. Continued use after a change means you accept the updated terms.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about these terms can be sent via <a class="inline-link" href="https://www.x.com/0x4rt1" target="_blank" rel="noopener">X (@0x4rt1)</a>.</p>
+
+    <div class="legal-note">This page is a general terms template, not legal advice. If you plan to operate this tool for a wider audience, have these terms reviewed by a lawyer familiar with your jurisdiction.</div>
+  </div>
+</section>
+
+<!-- ============ MODALS ============ -->
+<div class="modal-backdrop" id="modal-delete">
+  <div class="modal-card">
+    <h3>Remove this PDF?</h3>
+    <p>You'll return to the upload screen and lose your current border settings.</p>
+    <div class="modal-actions">
+      <button type="button" class="btn-modal-cancel" id="btn-cancel-delete">Cancel</button>
+      <button type="button" class="btn-modal-danger" id="btn-confirm-delete">Remove</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modal-success">
+  <div class="modal-card">
+    <div class="success-check"><svg viewBox="0 0 32 32" fill="none"><path d="M8 17l5 5 11-13" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <h3>Your PDF is ready!</h3>
+    <p>Your bordered PDF has been successfully created.</p>
+    <button type="button" class="btn-modal-primary" id="btn-modal-download">Download PDF</button>
+    <div class="modal-secondary-row">
+      <button type="button" class="btn-modal-secondary" id="btn-start-over">Start Over</button>
+      <button type="button" class="btn-modal-secondary" id="btn-edit-again">Edit Again</button>
+    </div>
+    <div class="modal-cloud-row">
+      <span class="btn-cloud-small">Save to Drive · Soon</span>
+      <span class="btn-cloud-small">Save to Dropbox · Soon</span>
+      <button type="button" class="btn-cloud-small" id="btn-share" style="cursor:pointer;color:var(--ink-soft);">Share</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+'use strict';
+pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+/* ============================================================
+   CONSTANTS & DATA
+   ============================================================ */
+var VIEW_HALF = 36;
+var CORNER_ANGLES = [0, 90, 180, 270]; // TL, TR, BR, BL
+
+var SVG_TEMPLATES = {
+  bracket:  { name: 'Bracket',  reach: 15, d: 'M0 15 L0 6 Q0 0 6 0 L15 0' },
+  flourish: { name: 'Flourish', reach: 24, d: 'M0 0 C6 0 5 9 12 9 C17 9 15 2 24 4 M0 0 C0 6 9 5 9 12 C9 17 2 15 4 24' },
+  diamond:  { name: 'Diamond',  reach: 18, d: 'M0 18 L0 6 L6 0 L18 0 M8 8 L11 5 L14 8 L11 11 Z' }
+};
+
+var PRESETS = {
+  assignment:   { style: 'solid',  color: '#1D4ED8', widthPt: 2,   margins: { top: 24, right: 24, bottom: 24, left: 24 } },
+  professional: { style: 'solid',  color: '#1F2937', widthPt: 1.5, margins: { top: 30, right: 30, bottom: 30, left: 30 } },
+  certificate:  { style: 'svg',    color: '#B8860B', widthPt: 2,   margins: { top: 40, right: 40, bottom: 40, left: 40 }, svgTemplate: 'flourish', svgPosition: 'frame' },
+  modern:       { style: 'solid',  color: '#111827', widthPt: 1,   margins: { top: 20, right: 20, bottom: 20, left: 20 } },
+  elegant:      { style: 'double', color: '#7C2D12', widthPt: 2,   margins: { top: 32, right: 32, bottom: 32, left: 32 } }
+};
+
+var PRESET_COLORS = ['#2563EB', '#1E3A8A', '#16A34A', '#7C3AED', '#991B1B', '#EA580C', '#0D9488', '#DB2777'];
+var COLOR_NAMES = ['Blue', 'Dark blue', 'Green', 'Purple', 'Dark red', 'Orange', 'Teal', 'Pink'];
+var CHIPS = ['College Assignments', 'School Projects', 'Lab Reports', 'Certificates', 'Professional Reports', 'Portfolios', 'Invitations', 'Formal Documents'];
+
+/* ============================================================
+   STATE
+   ============================================================ */
+var state = {
+  file: null,
+  originalBytes: null,
+  pdfDoc: null,
+  numPages: 0,
+  pages: [],
+  currentPage: 1,
+  zoomPercent: 100,
+  layoutMode: 'vertical',
+  generatedBlobUrl: null,
+  generatedFilename: 'bordered.pdf',
+  settings: {
+    pageRangeStr: '',
+    pageRangeSet: null,
+    style: 'solid',
+    color: '#000000',
+    widthPt: 2,
+    margins: { top: 20, right: 20, bottom: 20, left: 20 },
+    activePreset: null,
+    svg: { mode: 'template', templateId: 'bracket', customPath: null, customReach: 26, scalePct: 100, position: 'corners', rotation: 0, opacityPct: 100 }
+  }
+};
+var dragState = null;
+var zoomDebounceTimer = null;
+
+/* ============================================================
+   UTILITIES
+   ============================================================ */
+function clamp(v, min, max) { if (max < min) max = min; return Math.min(max, Math.max(min, v)); }
+function round2(n) { return Math.round(n * 100) / 100; }
+function debounce(fn, ms) { var t; return function () { var args = arguments, ctx = this; clearTimeout(t); t = setTimeout(function () { fn.apply(ctx, args); }, ms); }; }
+
+function hexToRgb01(hex) {
+  hex = (hex || '#000000').replace('#', '');
+  if (hex.length === 3) hex = hex.split('').map(function (c) { return c + c; }).join('');
+  var num = parseInt(hex, 16) || 0;
+  return [((num >> 16) & 255) / 255, ((num >> 8) & 255) / 255, (num & 255) / 255];
+}
+
+function parsePageRange(str, numPages) {
+  var s = (str || '').trim();
+  if (!s) return { set: null, error: null };
+  var set = new Set();
+  var parts = s.split(',').map(function (p) { return p.trim(); }).filter(Boolean);
+  for (var i = 0; i < parts.length; i++) {
+    var part = parts[i];
+    if (/^\d+-\d+$/.test(part)) {
+      var range = part.split('-').map(Number);
+      var a = range[0], b = range[1];
+      if (a > b) { var tmp = a; a = b; b = tmp; }
+      if (a < 1 || b > numPages) return { set: null, error: 'Page ' + (b > numPages ? b : a) + ' is out of range (1–' + numPages + ').' };
+      for (var n = a; n <= b; n++) set.add(n);
+    } else if (/^\d+$/.test(part)) {
+      var num = Number(part);
+      if (num < 1 || num > numPages) return { set: null, error: 'Page ' + num + ' is out of range (1–' + numPages + ').' };
+      set.add(num);
+    } else {
+      return { set: null, error: '"' + part + '" is not a valid page or range.' };
+    }
+  }
+  if (set.size === 0) return { set: null, error: 'Enter at least one page.' };
+  return { set: set, error: null };
+}
+
+function isSimplePath(d) { return /^[\sMLCQZ0-9.\-,eE]+$/.test(d || ''); }
+
+function parsePathCommands(d) {
+  var cmds = [];
+  var re = /([MLCQZ])|(-?\d*\.?\d+(?:[eE]-?\d+)?)/g;
+  var m, current = null;
+  while ((m = re.exec(d))) {
+    if (m[1]) { if (current) cmds.push(current); current = { type: m[1], args: [] }; }
+    else if (current) { current.args.push(parseFloat(m[2])); }
+  }
+  if (current) cmds.push(current);
+  return cmds;
+}
+
+function rotatePointDeg(x, y, angleDeg) {
+  var rad = (angleDeg % 360) * Math.PI / 180;
+  var cos = Math.cos(rad), sin = Math.sin(rad);
+  return [x * cos - y * sin, x * sin + y * cos];
+}
+
+function rotatePathString(d, angleDeg) {
+  angleDeg = ((angleDeg % 360) + 360) % 360;
+  if (angleDeg === 0) return d;
+  var cmds = parsePathCommands(d);
+  var out = [];
+  for (var i = 0; i < cmds.length; i++) {
+    var c = cmds[i];
+    if (c.type === 'Z') { out.push('Z'); continue; }
+    var pts = [];
+    for (var k = 0; k < c.args.length; k += 2) {
+      var rp = rotatePointDeg(c.args[k], c.args[k + 1], angleDeg);
+      pts.push(round2(rp[0]), round2(rp[1]));
+    }
+    out.push(c.type + ' ' + pts.join(' '));
+  }
+  return out.join(' ');
+}
+
+function getEffectiveTemplate() {
+  var s = state.settings.svg;
+  if (s.mode === 'custom' && s.customPath) return { d: s.customPath, reach: s.customReach || 26 };
+  return SVG_TEMPLATES[s.templateId] || SVG_TEMPLATES.bracket;
+}
+
+function svgIconMarkup(d, viewHalf) {
+  return '<svg viewBox="' + (-viewHalf) + ' ' + (-viewHalf) + ' ' + (viewHalf * 2) + ' ' + (viewHalf * 2) + '"><path d="' + d + '" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+}
+
+/* ============================================================
+   TOAST
+   ============================================================ */
+function showToast(msg) {
+  var c = document.getElementById('toast-container');
+  var t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  c.appendChild(t);
+  requestAnimationFrame(function () { t.classList.add('show'); });
+  setTimeout(function () { t.classList.remove('show'); setTimeout(function () { t.remove(); }, 250); }, 2800);
+}
+
+/* ============================================================
+   UPLOAD FLOW
+   ============================================================ */
+function setUploadState(s) {
+  document.getElementById('upload-state-idle').style.display = s === 'idle' ? '' : 'none';
+  document.getElementById('upload-state-loading').style.display = s === 'loading' ? '' : 'none';
+  document.getElementById('upload-state-error').style.display = s === 'error' ? '' : 'none';
+}
+function updateProgress(pct, label) {
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = label;
+}
+function showUploadError(msg) {
+  document.getElementById('error-message').textContent = msg;
+  setUploadState('error');
+}
+
+function handleFileSelected(file) {
+  if (!file) return;
+  var looksLikePdf = (file.type && file.type === 'application/pdf') || /\.pdf$/i.test(file.name || '');
+  if (!looksLikePdf) { showUploadError("That file doesn't look like a PDF. Please choose a .pdf file."); return; }
+  if (file.size > 60 * 1024 * 1024) { showUploadError('This file is larger than 60MB. Try a smaller PDF.'); return; }
+
+  setUploadState('loading');
+  updateProgress(0, 'Reading file…');
+  var reader = new FileReader();
+  reader.onprogress = function (e) {
+    if (e.lengthComputable) updateProgress(Math.round((e.loaded / e.total) * 55), 'Reading file…');
+  };
+  reader.onerror = function () { showUploadError('Could not read this file. Please try again.'); };
+  reader.onload = function () {
+    var bytes = reader.result;
+    updateProgress(60, 'Parsing PDF…');
+    var loadingTask = pdfjsLib.getDocument({ data: bytes.slice(0) });
+    loadingTask.onProgress = function (p) {
+      if (p.total) updateProgress(Math.min(60 + Math.round((p.loaded / p.total) * 35), 95), 'Parsing PDF…');
+    };
+    loadingTask.promise.then(function (pdfDoc) {
+      updateProgress(100, 'Ready');
+      state.file = file; state.originalBytes = bytes; state.pdfDoc = pdfDoc; state.numPages = pdfDoc.numPages;
+      setTimeout(openEditor, 200);
+    }).catch(function (err) {
+      console.error(err);
+      showUploadError("This doesn't look like a valid PDF. Please try another file.");
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+/* ============================================================
+   EDITOR: OPEN / RESET
+   ============================================================ */
+function openEditor() {
+  document.getElementById('view-landing').style.display = 'none';
+  var footer = document.querySelector('.site-footer');
+  if (footer) footer.style.display = 'none';
+  document.getElementById('view-editor').style.display = 'block';
+  document.getElementById('tb-page-count').textContent = state.numPages;
+  document.getElementById('tb-page-input').max = state.numPages;
+  resetSettingsToDefault();
+  renderAllPages();
+}
+
+function showStaticView(name) {
+  document.getElementById('view-landing').style.display = name === 'landing' ? '' : 'none';
+  document.getElementById('view-privacy').style.display = name === 'privacy' ? '' : 'none';
+  document.getElementById('view-terms').style.display = name === 'terms' ? '' : 'none';
+  document.getElementById('view-editor').style.display = 'none';
+  var footer = document.querySelector('.site-footer');
+  if (footer) footer.style.display = '';
+  document.getElementById('crumb-current').textContent = name === 'privacy' ? 'Privacy Policy' : (name === 'terms' ? 'Terms of Service' : 'Add PDF Border');
+  window.scrollTo(0, 0);
+  var newHash = name === 'landing' ? '' : ('#' + name);
+  if (('#' + (location.hash || '').replace('#', '')) !== (newHash || '#')) {
+    history.replaceState ? history.replaceState(null, '', location.pathname + newHash) : (location.hash = newHash);
+  }
+}
+
+function resetToLanding() {
+  state.file = null; state.originalBytes = null; state.pdfDoc = null; state.numPages = 0; state.pages = [];
+  document.getElementById('pages-container').innerHTML = '';
+  document.getElementById('view-editor').style.display = 'none';
+  document.getElementById('view-landing').style.display = '';
+  var footer = document.querySelector('.site-footer');
+  if (footer) footer.style.display = '';
+  document.getElementById('file-input').value = '';
+  setUploadState('idle');
+  document.getElementById('settings-col').classList.remove('drawer-open');
+  if (state.generatedBlobUrl) { URL.revokeObjectURL(state.generatedBlobUrl); state.generatedBlobUrl = null; }
+}
+
+function resetSettingsToDefault() {
+  state.zoomPercent = 100; state.layoutMode = 'vertical'; state.currentPage = 1;
+  state.settings = {
+    pageRangeStr: '', pageRangeSet: null, style: 'solid', color: '#000000', widthPt: 2,
+    margins: { top: 20, right: 20, bottom: 20, left: 20 }, activePreset: null,
+    svg: { mode: 'template', templateId: 'bracket', customPath: null, customReach: 26, scalePct: 100, position: 'corners', rotation: 0, opacityPct: 100 }
+  };
+  document.getElementById('input-page-range').value = '';
+  document.getElementById('page-range-error').style.display = 'none';
+  var pills = document.querySelectorAll('.preset-pill');
+  for (var i = 0; i < pills.length; i++) pills[i].classList.remove('active');
+  syncAllInputsFromState();
+}
+
+/* ============================================================
+   RENDERING
+   ============================================================ */
+function computeBaseScale() { return (state.zoomPercent / 100) * (96 / 72); }
+
+function renderAllPages() {
+  var container = document.getElementById('pages-container');
+  container.innerHTML = '';
+  state.pages = [];
+  var scale = computeBaseScale();
+  var idx = 1;
+  function next() {
+    if (idx > state.numPages) { setActivePage(1); updateAllOverlays(); updateZoomDisplay(); return; }
+    var n = idx;
+    state.pdfDoc.getPage(n).then(function (pageProxy) {
+      var vp = pageProxy.getViewport({ scale: 1 });
+      var wrap = document.createElement('div');
+      wrap.className = 'pdf-page';
+      wrap.dataset.pageNum = n;
+      var labelEl = document.createElement('div'); labelEl.className = 'page-label'; labelEl.textContent = 'Page ' + n;
+      wrap.appendChild(labelEl);
+      var canvas = document.createElement('canvas');
+      wrap.appendChild(canvas);
+      var overlay = document.createElement('div');
+      overlay.style.position = 'absolute'; overlay.style.inset = '0'; overlay.style.pointerEvents = 'none';
+      wrap.appendChild(overlay);
+      var excludedTag = document.createElement('div'); excludedTag.className = 'page-excluded-tag'; excludedTag.textContent = 'Not included'; excludedTag.style.display = 'none';
+      wrap.appendChild(excludedTag);
+      container.appendChild(wrap);
+
+      var pageObj = { num: n, pageProxy: pageProxy, widthPt: vp.width, heightPt: vp.height, el: wrap, canvas: canvas, overlay: overlay, excludedTag: excludedTag, scale: 1 };
+      state.pages.push(pageObj);
+      wrap.addEventListener('click', function (e) { if (!e.target.closest('.handle')) setActivePage(n); });
+      buildBorderFrame(pageObj);
+      renderPageCanvas(pageObj, scale).then(function () { idx++; next(); });
+    });
+  }
+  next();
+}
+
+function renderPageCanvas(pageObj, cssScale) {
+  var dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+  var viewport = pageObj.pageProxy.getViewport({ scale: cssScale * dpr });
+  var canvas = pageObj.canvas;
+  canvas.width = Math.ceil(viewport.width);
+  canvas.height = Math.ceil(viewport.height);
+  canvas.style.width = (viewport.width / dpr) + 'px';
+  canvas.style.height = (viewport.height / dpr) + 'px';
+  pageObj.el.style.width = (viewport.width / dpr) + 'px';
+  pageObj.el.style.height = (viewport.height / dpr) + 'px';
+  pageObj.scale = cssScale;
+  var ctx = canvas.getContext('2d');
+  return pageObj.pageProxy.render({ canvasContext: ctx, viewport: viewport }).promise;
+}
+
+function rerenderAllCanvasesForZoom() {
+  var scale = computeBaseScale();
+  var chain = Promise.resolve();
+  state.pages.forEach(function (p) { chain = chain.then(function () { return renderPageCanvas(p, scale); }); });
+  chain.then(function () { updateAllOverlays(); updateZoomDisplay(); });
+}
+
+/* ============================================================
+   BORDER OVERLAY
+   ============================================================ */
+function buildBorderFrame(pageObj) {
+  pageObj.overlay.innerHTML = '';
+  var frame = document.createElement('div');
+  frame.className = 'border-frame';
+  pageObj.overlay.appendChild(frame);
+  pageObj.frameEl = frame;
+  pageObj.svgCorners = [];
+  pageObj.svgFrameLines = [];
+  for (var k = 0; k < 4; k++) {
+    var c = document.createElement('div'); c.className = 'svg-corner'; c.style.display = 'none';
+    pageObj.overlay.appendChild(c); pageObj.svgCorners.push(c);
+  }
+  for (var j = 0; j < 4; j++) {
+    var l = document.createElement('div'); l.className = 'svg-frame-line'; l.style.display = 'none';
+    pageObj.overlay.appendChild(l); pageObj.svgFrameLines.push(l);
+  }
+  var handles = {};
+  ['top', 'right', 'bottom', 'left'].forEach(function (edge) {
+    var h = document.createElement('div'); h.className = 'handle h-' + edge; h.style.display = 'none';
+    h.addEventListener('pointerdown', function (e) { onHandlePointerDown(e, edge, pageObj); });
+    frame.appendChild(h);
+    handles[edge] = h;
+  });
+  pageObj.handles = handles;
+}
+
+function pageIncluded(num) {
+  var set = state.settings.pageRangeSet;
+  return !set || set.has(num);
+}
+
+function updateAllOverlays() {
+  state.pages.forEach(positionOverlayForPage);
+  syncMarginInputs();
+}
+
+function positionOverlayForPage(p) {
+  var s = state.settings;
+  var included = pageIncluded(p.num);
+  p.overlay.style.display = included ? '' : 'none';
+  p.excludedTag.style.display = included ? 'none' : 'flex';
+  if (!included) return;
+
+  var scale = p.scale;
+  var m = s.margins;
+  var leftPx = m.left * scale, topPx = m.top * scale;
+  var wPx = Math.max((p.widthPt - m.left - m.right) * scale, 0);
+  var hPx = Math.max((p.heightPt - m.top - m.bottom) * scale, 0);
+  var frame = p.frameEl;
+  frame.style.left = leftPx + 'px'; frame.style.top = topPx + 'px';
+  frame.style.width = wPx + 'px'; frame.style.height = hPx + 'px';
+  frame.className = 'border-frame style-' + s.style;
+  var widthPx = Math.max(s.widthPt * scale, 1);
+
+  if (s.style === 'svg') {
+    frame.style.borderWidth = '0';
+    layoutSvgCorners(p, leftPx, topPx, wPx, hPx, scale);
+  } else {
+    frame.style.borderColor = s.color;
+    frame.style.borderWidth = (s.style === 'double' ? Math.max(widthPx, 3) : widthPx) + 'px';
+    p.svgCorners.forEach(function (c) { c.style.display = 'none'; });
+    p.svgFrameLines.forEach(function (l) { l.style.display = 'none'; });
+  }
+
+  var active = p.num === state.currentPage;
+  var showHandles = active && s.style !== 'svg';
+  Object.keys(p.handles).forEach(function (k) { p.handles[k].style.display = showHandles ? 'block' : 'none'; });
+  p.el.classList.toggle('is-active', active);
+}
+
+function layoutSvgCorners(p, leftPx, topPx, wPx, hPx, scale) {
+  var s = state.settings.svg;
+  var tpl = getEffectiveTemplate();
+  var simple = isSimplePath(tpl.d);
+  var reachPt = Math.max(Math.min(p.widthPt - state.settings.margins.left - state.settings.margins.right,
+    p.heightPt - state.settings.margins.top - state.settings.margins.bottom) * 0.14 * (s.scalePct / 100), 6);
+  var unitsToPx = (reachPt / tpl.reach) * scale;
+  var boxPx = VIEW_HALF * 2 * unitsToPx;
+
+  var points = [
+    { x: leftPx, y: topPx },
+    { x: leftPx + wPx, y: topPx },
+    { x: leftPx + wPx, y: topPx + hPx },
+    { x: leftPx, y: topPx + hPx }
+  ];
+  points.forEach(function (pt, i) {
+    var angle = CORNER_ANGLES[i] + Number(s.rotation || 0);
+    var el = p.svgCorners[i];
+    el.style.display = 'block';
+    el.style.left = (pt.x - boxPx / 2) + 'px';
+    el.style.top = (pt.y - boxPx / 2) + 'px';
+    el.style.width = boxPx + 'px'; el.style.height = boxPx + 'px';
+    el.style.opacity = s.opacityPct / 100;
+    var dOut = simple ? rotatePathString(tpl.d, angle) : tpl.d;
+    var extraTransform = simple ? '' : ('transform:rotate(' + angle + 'deg);transform-origin:50% 50%;');
+    el.innerHTML = '<svg viewBox="' + (-VIEW_HALF) + ' ' + (-VIEW_HALF) + ' ' + (VIEW_HALF * 2) + ' ' + (VIEW_HALF * 2) +
+      '" width="100%" height="100%" style="' + extraTransform + '"><path d="' + dOut + '" stroke="' + state.settings.color +
+      '" stroke-width="2.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  });
+
+  var showFrame = s.position === 'frame';
+  var bw = Math.max(state.settings.widthPt * scale * 0.4, 1);
+  p.svgFrameLines.forEach(function (l, i) {
+    l.style.display = showFrame ? 'block' : 'none';
+    if (!showFrame) return;
+    l.style.borderColor = state.settings.color;
+    l.style.opacity = (s.opacityPct / 100) * 0.6;
+    if (i === 0) { l.style.left = leftPx + 'px'; l.style.top = topPx + 'px'; l.style.width = wPx + 'px'; l.style.height = '0px'; l.style.borderWidth = bw + 'px 0 0 0'; }
+    if (i === 1) { l.style.left = (leftPx + wPx) + 'px'; l.style.top = topPx + 'px'; l.style.width = '0px'; l.style.height = hPx + 'px'; l.style.borderWidth = '0 ' + bw + 'px 0 0'; }
+    if (i === 2) { l.style.left = leftPx + 'px'; l.style.top = (topPx + hPx) + 'px'; l.style.width = wPx + 'px'; l.style.height = '0px'; l.style.borderWidth = '0 0 ' + bw + 'px 0'; }
+    if (i === 3) { l.style.left = leftPx + 'px'; l.style.top = topPx + 'px'; l.style.width = '0px'; l.style.height = hPx + 'px'; l.style.borderWidth = '0 0 0 ' + bw + 'px'; }
+  });
+}
+
+function syncMarginInputs() {
+  document.getElementById('margin-top').value = Math.round(state.settings.margins.top);
+  document.getElementById('margin-right').value = Math.round(state.settings.margins.right);
+  document.getElementById('margin-bottom').value = Math.round(state.settings.margins.bottom);
+  document.getElementById('margin-left').value = Math.round(state.settings.margins.left);
+}
+
+/* ============================================================
+   DRAG HANDLES
+   ============================================================ */
+function onHandlePointerDown(e, edge, pageObj) {
+  e.preventDefault(); e.stopPropagation();
+  var handle = e.currentTarget;
+  try { handle.setPointerCapture(e.pointerId); } catch (err) {}
+  dragState = { edge: edge, pageObj: pageObj, startClientX: e.clientX, startClientY: e.clientY, startMargins: Object.assign({}, state.settings.margins), pointerId: e.pointerId, handle: handle };
+  window.addEventListener('pointermove', onHandlePointerMove);
+  window.addEventListener('pointerup', onHandlePointerUp);
+}
+function onHandlePointerMove(e) {
+  if (!dragState) return;
+  var edge = dragState.edge, pageObj = dragState.pageObj, startMargins = dragState.startMargins;
+  var dxPx = e.clientX - dragState.startClientX, dyPx = e.clientY - dragState.startClientY;
+  var scale = pageObj.scale;
+  var dxPt = dxPx / scale, dyPt = dyPx / scale;
+  var m = Object.assign({}, state.settings.margins);
+  var MIN = 10;
+  if (edge === 'top') m.top = clamp(startMargins.top + dyPt, 0, pageObj.heightPt - startMargins.bottom - MIN);
+  if (edge === 'bottom') m.bottom = clamp(startMargins.bottom - dyPt, 0, pageObj.heightPt - startMargins.top - MIN);
+  if (edge === 'left') m.left = clamp(startMargins.left + dxPt, 0, pageObj.widthPt - startMargins.right - MIN);
+  if (edge === 'right') m.right = clamp(startMargins.right - dxPt, 0, pageObj.widthPt - startMargins.left - MIN);
+  state.settings.margins = m;
+  positionOverlayForPage(pageObj);
+  syncMarginInputs();
+}
+function onHandlePointerUp() {
+  if (!dragState) return;
+  try { dragState.handle.releasePointerCapture(dragState.pointerId); } catch (err) {}
+  window.removeEventListener('pointermove', onHandlePointerMove);
+  window.removeEventListener('pointerup', onHandlePointerUp);
+  dragState = null;
+  clearActivePresetIfMismatch();
+  updateAllOverlays();
+}
+
+/* ============================================================
+   TOOLBAR: PAGE NAV / ZOOM / FIT / FULLSCREEN / LAYOUT
+   ============================================================ */
+function updateNavButtons() {
+  document.getElementById('btn-prev-page').disabled = state.currentPage <= 1;
+  document.getElementById('btn-next-page').disabled = state.currentPage >= state.numPages;
+}
+function setActivePage(num) {
+  num = clamp(num, 1, state.numPages || 1);
+  state.currentPage = num;
+  document.getElementById('tb-page-input').value = num;
+  updateNavButtons();
+  updateAllOverlays();
+  if (state.layoutMode === 'single') applyLayoutMode();
+}
+function scrollToActivePage() {
+  var p = state.pages[state.currentPage - 1];
+  if (p) p.el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+}
+function updateZoomDisplay() { document.getElementById('tb-zoom-display').textContent = Math.round(state.zoomPercent) + '%'; }
+function changeZoom(delta) {
+  state.zoomPercent = clamp(state.zoomPercent + delta, 25, 300);
+  updateZoomDisplay();
+  clearTimeout(zoomDebounceTimer);
+  zoomDebounceTimer = setTimeout(rerenderAllCanvasesForZoom, 180);
+}
+function applyLayoutMode() {
+  state.pages.forEach(function (p) {
+    p.el.style.display = (state.layoutMode === 'single' && p.num !== state.currentPage) ? 'none' : '';
+  });
+}
+
+/* ============================================================
+   SETTINGS SYNC
+   ============================================================ */
+function setColorInputsOnly(hex) {
+  document.getElementById('input-color').value = hex;
+  document.getElementById('input-hex').value = hex;
+  document.getElementById('color-swatch-btn').style.background = hex;
+  var swatches = document.querySelectorAll('.preset-color');
+  for (var i = 0; i < swatches.length; i++) swatches[i].classList.toggle('active', swatches[i].dataset.color.toLowerCase() === hex.toLowerCase());
+}
+function syncAllInputsFromState() {
+  document.getElementById('select-style').value = state.settings.style;
+  document.getElementById('svg-panel').style.display = state.settings.style === 'svg' ? 'block' : 'none';
+  setColorInputsOnly(state.settings.color);
+  document.getElementById('input-width').value = state.settings.widthPt;
+  syncMarginInputs();
+  document.getElementById('svg-position').value = state.settings.svg.position;
+  document.getElementById('svg-rotation').value = state.settings.svg.rotation;
+  document.getElementById('svg-rotation-val').textContent = state.settings.svg.rotation + '°';
+  document.getElementById('svg-scale').value = state.settings.svg.scalePct;
+  document.getElementById('svg-scale-val').textContent = state.settings.svg.scalePct + '%';
+  document.getElementById('svg-opacity').value = state.settings.svg.opacityPct;
+  document.getElementById('svg-opacity-val').textContent = state.settings.svg.opacityPct + '%';
+  var tiles = document.querySelectorAll('.template-tile');
+  for (var i = 0; i < tiles.length; i++) tiles[i].classList.toggle('active', tiles[i].dataset.template === state.settings.svg.templateId && state.settings.svg.mode === 'template');
+  document.getElementById('btn-choose-template').classList.toggle('active', state.settings.svg.mode !== 'custom');
+  document.getElementById('btn-upload-svg').classList.toggle('active', state.settings.svg.mode === 'custom');
+}
+function setColor(hex) {
+  state.settings.color = hex;
+  setColorInputsOnly(hex);
+  updateAllOverlays();
+}
+function clearActivePresetIfMismatch() {
+  state.settings.activePreset = null;
+  var pills = document.querySelectorAll('.preset-pill');
+  for (var i = 0; i < pills.length; i++) pills[i].classList.remove('active');
+}
+function applyPreset(id) {
+  var cfg = PRESETS[id];
+  if (!cfg) return;
+  state.settings.style = cfg.style;
+  state.settings.color = cfg.color;
+  state.settings.widthPt = cfg.widthPt;
+  state.settings.margins = Object.assign({}, cfg.margins);
+  state.settings.activePreset = id;
+  if (cfg.style === 'svg') {
+    state.settings.svg.templateId = cfg.svgTemplate;
+    state.settings.svg.position = cfg.svgPosition || 'corners';
+    state.settings.svg.mode = 'template';
+  }
+  syncAllInputsFromState();
+  var pills = document.querySelectorAll('.preset-pill');
+  for (var i = 0; i < pills.length; i++) pills[i].classList.toggle('active', pills[i].dataset.preset === id);
+  updateAllOverlays();
+}
+
+/* ============================================================
+   SVG UPLOAD
+   ============================================================ */
+function handleSvgUpload(file) {
+  file.text().then(function (text) {
+    var doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+    if (doc.querySelector('parsererror')) { showToast("Couldn't read that SVG file."); return; }
+    var pathEls = Array.prototype.slice.call(doc.querySelectorAll('path')).slice(0, 6);
+    var dParts = pathEls.map(function (p) { return p.getAttribute('d') || ''; }).filter(Boolean);
+    if (dParts.length === 0) { showToast('No vector paths found in that SVG.'); return; }
+    var dCombined = dParts.join(' ');
+    var reach = 26;
+    var svgRoot = doc.querySelector('svg');
+    var vb = svgRoot && svgRoot.getAttribute('viewBox');
+    if (vb) {
+      var parts = vb.trim().split(/\s+/).map(Number);
+      if (parts.length === 4 && (parts[2] || parts[3])) reach = Math.max(parts[2], parts[3]) / 2;
+    }
+    state.settings.svg.mode = 'custom';
+    state.settings.svg.customPath = dCombined;
+    state.settings.svg.customReach = reach || 26;
+    document.getElementById('btn-upload-svg').classList.add('active');
+    document.getElementById('btn-choose-template').classList.remove('active');
+    var tiles = document.querySelectorAll('.template-tile');
+    for (var i = 0; i < tiles.length; i++) tiles[i].classList.remove('active');
+    updateAllOverlays();
+    showToast('Custom SVG loaded');
+  }).catch(function () { showToast("Couldn't read that SVG file."); });
+}
+
+/* ============================================================
+   PDF GENERATION (pdf-lib)
+   ============================================================ */
+function drawDoubleRect(page, x, y, w, h, color, widthPt) {
+  var bw = Math.max(widthPt * 0.5, 0.5);
+  var gap = Math.max(widthPt * 1.8, 3);
+  page.drawRectangle({ x: x, y: y, width: w, height: h, borderColor: color, borderWidth: bw });
+  var ix = x + gap, iy = y + gap, iw = w - 2 * gap, ih = h - 2 * gap;
+  if (iw > 2 && ih > 2) page.drawRectangle({ x: ix, y: iy, width: iw, height: ih, borderColor: color, borderWidth: bw });
+}
+function edgesOf(x, y, w, h) {
+  return [
+    [{ x: x, y: y }, { x: x + w, y: y }],
+    [{ x: x + w, y: y }, { x: x + w, y: y + h }],
+    [{ x: x + w, y: y + h }, { x: x, y: y + h }],
+    [{ x: x, y: y + h }, { x: x, y: y }]
+  ];
+}
+function drawDashedRect(page, x, y, w, h, color, thickness) {
+  var dashLen = Math.max(thickness * 4, 5), gapLen = Math.max(thickness * 2.5, 3.5);
+  edgesOf(x, y, w, h).forEach(function (edge) {
+    var p1 = edge[0], p2 = edge[1];
+    var dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy);
+    if (len === 0) return;
+    var ux = dx / len, uy = dy / len, pos = 0, draw = true;
+    while (pos < len) {
+      var step = draw ? dashLen : gapLen;
+      var next = Math.min(pos + step, len);
+      if (draw) page.drawLine({ start: { x: p1.x + ux * pos, y: p1.y + uy * pos }, end: { x: p1.x + ux * next, y: p1.y + uy * next }, thickness: thickness, color: color });
+      pos = next; draw = !draw;
+    }
+  });
+}
+function drawDottedRect(page, x, y, w, h, color, thickness) {
+  var r = Math.max(thickness / 2, 0.6);
+  var spacing = Math.max(thickness * 3, 4.5);
+  edgesOf(x, y, w, h).forEach(function (edge) {
+    var p1 = edge[0], p2 = edge[1];
+    var dx = p2.x - p1.x, dy = p2.y - p1.y, len = Math.hypot(dx, dy);
+    if (len === 0) return;
+    var steps = Math.max(Math.floor(len / spacing), 1);
+    for (var s = 0; s <= steps; s++) {
+      var t = s / steps;
+      page.drawCircle({ x: p1.x + dx * t, y: p1.y + dy * t, size: r, color: color });
+    }
+  });
+}
+function drawSvgFrame(page, x, y, w, h, color, widthPt, svgSettings) {
+  var tpl = getEffectiveTemplate();
+  var simple = isSimplePath(tpl.d);
+  var reachPt = Math.max(Math.min(w, h) * 0.14 * (svgSettings.scalePct / 100), 6);
+  var unitsToPt = reachPt / tpl.reach;
+  var points = [
+    { x: x, y: y + h },       // TL
+    { x: x + w, y: y + h },   // TR
+    { x: x + w, y: y },       // BR
+    { x: x, y: y }            // BL
+  ];
+  points.forEach(function (pt, i) {
+    var angle = CORNER_ANGLES[i] + Number(svgSettings.rotation || 0);
+    var dOut, rotateOpt;
+    if (simple) { dOut = rotatePathString(tpl.d, angle); rotateOpt = undefined; }
+    else { dOut = tpl.d; rotateOpt = PDFLib.degrees(angle); }
+    page.drawSvgPath(dOut, {
+      x: pt.x, y: pt.y, scale: unitsToPt, rotate: rotateOpt,
+      borderColor: color, borderWidth: Math.max(widthPt * 0.55, 0.75),
+      opacity: svgSettings.opacityPct / 100, borderOpacity: svgSettings.opacityPct / 100
+    });
+  });
+  if (svgSettings.position === 'frame') {
+    var bw = Math.max(widthPt * 0.4, 0.6);
+    page.drawRectangle({ x: x, y: y, width: w, height: h, borderColor: color, borderWidth: bw, borderOpacity: (svgSettings.opacityPct / 100) * 0.6 });
+  }
+}
+
+function generateBorderedPdf(bytes, settings) {
+  var PDFDocument = PDFLib.PDFDocument, rgb = PDFLib.rgb;
+  return PDFDocument.load(bytes, { ignoreEncryption: true }).then(function (pdfDoc) {
+    var pages = pdfDoc.getPages();
+    var targetSet = settings.pageRangeSet;
+    var rgbArr = hexToRgb01(settings.color);
+    var color = rgb(rgbArr[0], rgbArr[1], rgbArr[2]);
+    var widthPt = settings.widthPt;
+    var skipped = 0;
+    for (var i = 0; i < pages.length; i++) {
+      var pageNum = i + 1;
+      if (targetSet && !targetSet.has(pageNum)) continue;
+      var page = pages[i];
+      var size = page.getSize();
+      var m = settings.margins;
+      var x = m.left, y = m.bottom, w = size.width - m.left - m.right, h = size.height - m.top - m.bottom;
+      if (w <= 1 || h <= 1) { skipped++; continue; }
+      if (settings.style === 'solid') page.drawRectangle({ x: x, y: y, width: w, height: h, borderColor: color, borderWidth: widthPt });
+      else if (settings.style === 'double') drawDoubleRect(page, x, y, w, h, color, widthPt);
+      else if (settings.style === 'dashed') drawDashedRect(page, x, y, w, h, color, widthPt);
+      else if (settings.style === 'dotted') drawDottedRect(page, x, y, w, h, color, widthPt);
+      else if (settings.style === 'svg') drawSvgFrame(page, x, y, w, h, color, widthPt, settings.svg);
+    }
+    if (skipped > 0) showToast(skipped + ' page(s) skipped — margins too large for the page size.');
+    return pdfDoc.save();
+  });
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function init() {
+  // Chip grid
+  var chipIcon = '<svg viewBox="0 0 20 20" fill="none"><rect x="4" y="2" width="12" height="16" rx="1.5" stroke="currentColor" stroke-width="1.6"/><path d="M7 7h6M7 10h6M7 13h4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
+  var chipGrid = document.getElementById('chip-grid');
+  CHIPS.forEach(function (label) {
+    var d = document.createElement('div'); d.className = 'chip-card'; d.innerHTML = chipIcon + '<span>' + label + '</span>';
+    chipGrid.appendChild(d);
+  });
+
+  // Preset color swatches
+  var presetColorsEl = document.getElementById('preset-colors');
+  PRESET_COLORS.forEach(function (c, i) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'preset-color'; b.style.background = c; b.dataset.color = c;
+    b.title = COLOR_NAMES[i]; b.setAttribute('aria-label', COLOR_NAMES[i]);
+    b.addEventListener('click', function () { setColor(c); });
+    presetColorsEl.appendChild(b);
+  });
+
+  // SVG template gallery
+  var templateGrid = document.getElementById('template-grid');
+  Object.keys(SVG_TEMPLATES).forEach(function (key) {
+    var tpl = SVG_TEMPLATES[key];
+    var tile = document.createElement('button');
+    tile.type = 'button'; tile.className = 'template-tile'; tile.dataset.template = key;
+    tile.innerHTML = svgIconMarkup(tpl.d, VIEW_HALF) + '<span>' + tpl.name + '</span>';
+    tile.addEventListener('click', function () {
+      state.settings.svg.templateId = key; state.settings.svg.mode = 'template';
+      var tiles = document.querySelectorAll('.template-tile');
+      for (var i = 0; i < tiles.length; i++) tiles[i].classList.remove('active');
+      tile.classList.add('active');
+      document.getElementById('btn-choose-template').classList.add('active');
+      document.getElementById('btn-upload-svg').classList.remove('active');
+      updateAllOverlays();
+    });
+    templateGrid.appendChild(tile);
+  });
+
+  // Nav links (non-functional placeholders)
+  Array.prototype.forEach.call(document.querySelectorAll('[data-nav]'), function (a) {
+    a.addEventListener('click', function (e) { e.preventDefault(); });
+  });
+
+  // Breadcrumb / footer navigation to Privacy & Terms pages
+  document.getElementById('crumb-home').addEventListener('click', function (e) {
+    e.preventDefault();
+    var editorVisible = window.getComputedStyle(document.getElementById('view-editor')).display !== 'none';
+    if (editorVisible) openModal('modal-delete');
+    else showStaticView('landing');
+  });
+  document.getElementById('footer-link-privacy').addEventListener('click', function (e) { e.preventDefault(); showStaticView('privacy'); });
+  document.getElementById('footer-link-terms').addEventListener('click', function (e) { e.preventDefault(); showStaticView('terms'); });
+  document.getElementById('privacy-back').addEventListener('click', function (e) { e.preventDefault(); showStaticView('landing'); });
+  document.getElementById('terms-back').addEventListener('click', function (e) { e.preventDefault(); showStaticView('landing'); });
+  window.addEventListener('hashchange', function () {
+    var h = (location.hash || '').replace('#', '');
+    var editorVisible = window.getComputedStyle(document.getElementById('view-editor')).display !== 'none';
+    if (editorVisible) return;
+    if (h === 'privacy' || h === 'terms') showStaticView(h);
+    else showStaticView('landing');
+  });
+  var initialHash = (location.hash || '').replace('#', '');
+  if (initialHash === 'privacy' || initialHash === 'terms') showStaticView(initialHash);
+
+  // Cloud buttons (upload card + success modal)
+  Array.prototype.forEach.call(document.querySelectorAll('[data-cloud]'), function (btn) {
+    btn.addEventListener('click', function () { showToast(btn.dataset.cloud + " isn't available in this demo yet."); });
+  });
+
+  // Upload dropzone
+  var dropzone = document.getElementById('dropzone');
+  var fileInput = document.getElementById('file-input');
+  ['dragenter', 'dragover'].forEach(function (evt) {
+    dropzone.addEventListener(evt, function (e) { e.preventDefault(); e.stopPropagation(); dropzone.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(function (evt) {
+    dropzone.addEventListener(evt, function (e) { e.preventDefault(); e.stopPropagation(); dropzone.classList.remove('dragover'); });
+  });
+  dropzone.addEventListener('drop', function (e) {
+    var f = e.dataTransfer.files && e.dataTransfer.files[0];
+    if (f) handleFileSelected(f);
+  });
+  dropzone.addEventListener('click', function (e) { if (!e.target.closest('button')) fileInput.click(); });
+  document.getElementById('btn-select-files').addEventListener('click', function (e) { e.stopPropagation(); fileInput.click(); });
+  fileInput.addEventListener('change', function (e) { var f = e.target.files[0]; if (f) handleFileSelected(f); });
+  document.getElementById('btn-retry').addEventListener('click', function () { setUploadState('idle'); });
+
+  // Page range
+  document.getElementById('input-page-range').addEventListener('input', debounce(function (e) {
+    var val = e.target.value;
+    state.settings.pageRangeStr = val;
+    var result = parsePageRange(val, state.numPages);
+    var errEl = document.getElementById('page-range-error');
+    if (result.error) { errEl.textContent = result.error; errEl.style.display = 'block'; }
+    else { errEl.style.display = 'none'; state.settings.pageRangeSet = result.set; updateAllOverlays(); }
+  }, 300));
+
+  // Style
+  document.getElementById('select-style').addEventListener('change', function (e) {
+    state.settings.style = e.target.value;
+    document.getElementById('svg-panel').style.display = state.settings.style === 'svg' ? 'block' : 'none';
+    clearActivePresetIfMismatch();
+    updateAllOverlays();
+  });
+
+  // Color
+  document.getElementById('input-color').addEventListener('input', function (e) { clearActivePresetIfMismatch(); setColor(e.target.value); });
+  document.getElementById('input-hex').addEventListener('change', function (e) {
+    var v = e.target.value.trim();
+    if (v[0] !== '#') v = '#' + v;
+    if (/^#([0-9a-fA-F]{6}|[0-9a-fA-F]{3})$/.test(v)) { clearActivePresetIfMismatch(); setColor(v); }
+    else { e.target.value = state.settings.color; showToast('Enter a valid hex color, e.g. #DC2626'); }
+  });
+
+  // Presets
+  Array.prototype.forEach.call(document.querySelectorAll('.preset-pill'), function (btn) {
+    btn.addEventListener('click', function () { applyPreset(btn.dataset.preset); });
+  });
+
+  // Width
+  document.getElementById('input-width').addEventListener('input', function (e) {
+    var v = parseFloat(e.target.value);
+    if (isNaN(v)) return;
+    v = clamp(v, 0.5, 20);
+    state.settings.widthPt = v;
+    clearActivePresetIfMismatch();
+    updateAllOverlays();
+  });
+
+  // Margins
+  ['top', 'right', 'bottom', 'left'].forEach(function (edge) {
+    document.getElementById('margin-' + edge).addEventListener('input', function (e) {
+      var v = parseFloat(e.target.value);
+      if (isNaN(v)) v = 0;
+      v = Math.max(0, v);
+      state.settings.margins[edge] = v;
+      clearActivePresetIfMismatch();
+      updateAllOverlays();
+    });
+  });
+  document.getElementById('btn-recommended-margins').addEventListener('click', function () {
+    state.settings.margins = { top: 28, right: 28, bottom: 28, left: 28 };
+    clearActivePresetIfMismatch();
+    syncMarginInputs();
+    updateAllOverlays();
+  });
+
+  // SVG panel
+  document.getElementById('btn-choose-template').addEventListener('click', function () {
+    state.settings.svg.mode = 'template';
+    document.getElementById('btn-choose-template').classList.add('active');
+    document.getElementById('btn-upload-svg').classList.remove('active');
+    updateAllOverlays();
+  });
+  document.getElementById('btn-upload-svg').addEventListener('click', function () { document.getElementById('svg-file-input').click(); });
+  document.getElementById('svg-file-input').addEventListener('change', function (e) {
+    var f = e.target.files[0]; if (f) handleSvgUpload(f); e.target.value = '';
+  });
+  document.getElementById('svg-scale').addEventListener('input', function (e) {
+    state.settings.svg.scalePct = Number(e.target.value);
+    document.getElementById('svg-scale-val').textContent = e.target.value + '%';
+    updateAllOverlays();
+  });
+  document.getElementById('svg-rotation').addEventListener('input', function (e) {
+    state.settings.svg.rotation = Number(e.target.value);
+    document.getElementById('svg-rotation-val').textContent = e.target.value + '°';
+    updateAllOverlays();
+  });
+  document.getElementById('svg-opacity').addEventListener('input', function (e) {
+    state.settings.svg.opacityPct = Number(e.target.value);
+    document.getElementById('svg-opacity-val').textContent = e.target.value + '%';
+    updateAllOverlays();
+  });
+  document.getElementById('svg-position').addEventListener('change', function (e) {
+    state.settings.svg.position = e.target.value;
+    updateAllOverlays();
+  });
+
+  // Viewer toolbar
+  document.getElementById('btn-prev-page').addEventListener('click', function () { setActivePage(state.currentPage - 1); scrollToActivePage(); });
+  document.getElementById('btn-next-page').addEventListener('click', function () { setActivePage(state.currentPage + 1); scrollToActivePage(); });
+  document.getElementById('tb-page-input').addEventListener('change', function (e) {
+    var v = parseInt(e.target.value, 10); if (isNaN(v)) v = 1;
+    setActivePage(v); scrollToActivePage();
+  });
+  document.getElementById('btn-zoom-in').addEventListener('click', function () { changeZoom(15); });
+  document.getElementById('btn-zoom-out').addEventListener('click', function () { changeZoom(-15); });
+  document.getElementById('btn-fit-screen').addEventListener('click', function () {
+    var activeP = state.pages[state.currentPage - 1] || state.pages[0];
+    if (!activeP) return;
+    var available = document.getElementById('workspace-inner').clientWidth - 96;
+    var targetCssScale = available / activeP.widthPt;
+    state.zoomPercent = clamp((targetCssScale / (96 / 72)) * 100, 25, 300);
+    updateZoomDisplay();
+    rerenderAllCanvasesForZoom();
+  });
+  document.getElementById('btn-fullscreen').addEventListener('click', function () {
+    var el = document.getElementById('workspace-col');
+    if (!document.fullscreenElement) { if (el.requestFullscreen) el.requestFullscreen(); }
+    else if (document.exitFullscreen) document.exitFullscreen();
+  });
+  document.getElementById('btn-layout-toggle').addEventListener('click', function () {
+    state.layoutMode = state.layoutMode === 'vertical' ? 'single' : 'vertical';
+    applyLayoutMode();
+  });
+
+  // Delete PDF
+  document.getElementById('btn-delete-pdf').addEventListener('click', function () { openModal('modal-delete'); });
+  document.getElementById('btn-cancel-delete').addEventListener('click', function () { closeModal('modal-delete'); });
+  document.getElementById('btn-confirm-delete').addEventListener('click', function () { closeModal('modal-delete'); resetToLanding(); });
+
+  // Download
+  document.getElementById('btn-download').addEventListener('click', handleDownloadClick);
+  document.getElementById('btn-modal-download').addEventListener('click', triggerDownload);
+  document.getElementById('btn-start-over').addEventListener('click', function () { closeModal('modal-success'); resetToLanding(); });
+  document.getElementById('btn-edit-again').addEventListener('click', function () { closeModal('modal-success'); });
+  document.getElementById('btn-share').addEventListener('click', shareGeneratedPdf);
+
+  // Mobile drawer
+  document.getElementById('drawer-handle').addEventListener('click', function () {
+    document.getElementById('settings-col').classList.toggle('drawer-open');
+  });
+
+  syncAllInputsFromState();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+function buildOutputFilename() {
+  var base = (state.file && state.file.name) ? state.file.name.replace(/\.pdf$/i, '') : 'document';
+  return base + '-bordered.pdf';
+}
+function triggerDownload() {
+  if (!state.generatedBlobUrl) return;
+  var a = document.createElement('a');
+  a.href = state.generatedBlobUrl; a.download = state.generatedFilename;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function handleDownloadClick() {
+  var result = parsePageRange(document.getElementById('input-page-range').value, state.numPages);
+  var errEl = document.getElementById('page-range-error');
+  if (result.error) { errEl.textContent = result.error; errEl.style.display = 'block'; showToast('Fix the page range before downloading.'); return; }
+  errEl.style.display = 'none';
+  state.settings.pageRangeSet = result.set;
+
+  var btn = document.getElementById('btn-download');
+  btn.classList.add('is-loading'); btn.disabled = true;
+  btn.querySelector('.dl-label').textContent = 'Applying border…';
+
+  generateBorderedPdf(state.originalBytes.slice(0), state.settings).then(function (bytes) {
+    var blob = new Blob([bytes], { type: 'application/pdf' });
+    if (state.generatedBlobUrl) URL.revokeObjectURL(state.generatedBlobUrl);
+    state.generatedBlobUrl = URL.createObjectURL(blob);
+    state.generatedFilename = buildOutputFilename();
+    btn.querySelector('.dl-label').textContent = 'PDF Ready — Download';
+    setTimeout(function () {
+      btn.classList.remove('is-loading'); btn.disabled = false;
+      btn.querySelector('.dl-label').textContent = 'Download PDF';
+      openModal('modal-success');
+    }, 500);
+  }).catch(function (err) {
+    console.error(err);
+    btn.classList.remove('is-loading'); btn.disabled = false;
+    btn.querySelector('.dl-label').textContent = 'Download PDF';
+    showToast('Something went wrong generating the PDF. This file may be password-protected.');
+  });
+}
+function shareGeneratedPdf() {
+  if (!state.generatedBlobUrl) return;
+  fetch(state.generatedBlobUrl).then(function (r) { return r.blob(); }).then(function (blob) {
+    var file = new File([blob], state.generatedFilename, { type: 'application/pdf' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], title: 'PDF Border' });
+    } else {
+      triggerDownload();
+      showToast('Sharing is not supported here — downloading instead.');
+    }
+  }).catch(function (err) { if (err && err.name !== 'AbortError') showToast('Could not share this file.'); });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
